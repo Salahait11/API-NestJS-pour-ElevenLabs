@@ -1,27 +1,23 @@
-# API NestJS pour ElevenLabs
+# API NestJS pour ElevenLabs et Gemini
 
-Ce projet est une API NestJS qui permet de générer des fichiers audio à partir de texte en utilisant l'API ElevenLabs. Il offre une interface web simple pour tester la génération d'audio et la sélection des voix disponibles.
+Une interface de chat moderne et interactive qui utilise l'API ElevenLabs pour la synthèse vocale, construite avec NestJS et une interface utilisateur dynamique.
 
-## Fonctionnalités
+## 🌟 Fonctionnalités
 
-- Génération d'audio à partir de texte
-- Sélection parmi toutes les voix disponibles d'ElevenLabs
-- Interface web intuitive pour tester l'API
-- Gestion des erreurs et validation des entrées
-- Configuration via variables d'environnement
+- 💬 Interface de chat moderne et responsive
+- 🎙️ Synthèse vocale avec ElevenLabs
+- 🌍 Support multilingue
+- 💾 Sauvegarde locale des conversations
+- 🎨 Interface utilisateur animée et interactive
+- 📱 Design responsive pour mobile et desktop
+- 🔒 Gestion sécurisée des clés API
 
-## Prérequis
-
-- Node.js (version 14 ou supérieure)
-- npm (généralement installé avec Node.js)
-- Une clé API ElevenLabs valide
-
-## Installation
+## 🚀 Installation
 
 1. Clonez le repository :
 ```bash
-git clone https://github.com/Salahait11/API-NestJS-pour-ElevenLabs.git
-cd nestjs-elevenlabs-api
+git clone [URL_DU_REPO]
+cd API-NestJS-pour-ElevenLabs
 ```
 
 2. Installez les dépendances :
@@ -29,103 +25,123 @@ cd nestjs-elevenlabs-api
 npm install
 ```
 
-3. Créez un fichier `.env` à la racine du projet avec les variables suivantes :
+3. Configurez les variables d'environnement :
+Créez un fichier `.env` à la racine du projet avec les variables suivantes :
 ```env
-ELEVENLABS_API_KEY=votre_clé_api_elevenlabs
+ELEVENLABS_API_KEY=votre_clé_api
 ```
 
-## Configuration
+## 🛠️ Technologies utilisées
 
-Le projet utilise les variables d'environnement suivantes :
+- **Backend** :
+  - NestJS
+  - TypeScript
+  - Axios pour les requêtes HTTP
+  - Dotenv pour la gestion des variables d'environnement
 
-- `ELEVENLABS_API_KEY` : Votre clé API ElevenLabs (obligatoire)
-- `PORT` : Le port sur lequel le serveur s'exécute (optionnel, par défaut 3000)
+- **Frontend** :
+  - HTML5
+  - CSS3 avec animations modernes
+  - JavaScript vanilla
+  - LocalStorage pour la persistance des données
 
-## Démarrage
+## 📱 Fonctionnalités de l'interface
 
-Pour démarrer le serveur en mode développement :
+### Interface de chat
+- Messages avec animations fluides
+- Support du formatage Markdown
+- Affichage du code avec coloration syntaxique
+- Lecteur audio intégré pour les réponses vocales
+- Indicateur de chargement animé
 
+### Gestion des conversations
+- Création de nouvelles conversations
+- Sauvegarde automatique des conversations
+- Masquage des conversations (suppression logique)
+- Interface responsive pour mobile et desktop
+
+### Formatage des messages
+- Support du code avec coloration syntaxique
+- Listes à puces
+- Citations
+- Texte en gras et italique
+- Liens cliquables
+- Images
+
+## 🔧 Configuration
+
+### Variables d'environnement
+- `ELEVENLABS_API_KEY` : Votre clé API ElevenLabs
+
+### Options de configuration
+Le projet peut être configuré via le fichier `config.ts` :
+- Port du serveur
+- Options de l'API ElevenLabs
+- Paramètres de l'interface utilisateur
+
+## 🚀 Démarrage
+
+1. Démarrez le serveur de développement :
 ```bash
 npm run start:dev
 ```
 
-Pour démarrer le serveur en mode production :
-
-```bash
-npm run build
-npm run start:prod
+2. Accédez à l'interface dans votre navigateur :
+```
+http://localhost:3000
 ```
 
-## Utilisation
+## 📝 Utilisation
 
-### Interface Web
+1. **Nouvelle conversation** :
+   - Cliquez sur le bouton "Nouvelle conversation" pour démarrer
+   - L'interface affiche un message de bienvenue
 
-Accédez à l'interface web à l'adresse : `http://localhost:3000`
+2. **Envoi de messages** :
+   - Tapez votre message dans la zone de texte
+   - Appuyez sur Entrée ou cliquez sur l'icône d'envoi
+   - Attendez la réponse avec l'indicateur de chargement
 
-L'interface permet de :
-- Saisir le texte à convertir en audio
-- Sélectionner une voix parmi celles disponibles
-- Générer et écouter l'audio
+3. **Gestion des conversations** :
+   - Les conversations sont automatiquement sauvegardées
+   - Utilisez le bouton de masquage pour cacher une conversation
+   - Les conversations masquées ne sont plus affichées
 
-### API Endpoints
+4. **Fonctionnalités vocales** :
+   - Les réponses peuvent être converties en audio
+   - Utilisez le lecteur audio intégré pour écouter
 
-#### Générer de l'audio
-```http
-POST /audio/generate
-Content-Type: application/json
+## 🔒 Sécurité
 
-{
-    "text": "Votre texte à convertir",
-    "voiceId": "ID_DE_LA_VOIX" // Optionnel
-}
+- Les clés API sont stockées de manière sécurisée
+- Validation des entrées utilisateur
+- Protection contre les injections
+- Gestion sécurisée des données sensibles
+
+## 🛠️ Développement
+
+### Structure du projet
+```
+├── src/
+│   ├── controllers/
+│   ├── services/
+│   ├── config/
+│   └── main.ts
+├── public/
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
+├── .env
+└── package.json
 ```
 
-#### Obtenir la liste des voix
-```http
-GET /audio/voices
-```
-
-## Structure du Projet
-
-```
-src/
-├── app.controller.ts    # Contrôleur principal avec l'interface web
-├── app.module.ts        # Module principal de l'application
-├── main.ts             # Point d'entrée de l'application
-└── audio/              # Module audio
-    ├── audio.controller.ts
-    ├── audio.service.ts
-    ├── audio.module.ts
-    └── dto/
-        └── create-audio.dto.ts
-```
-
-## Développement
-
-### Commandes disponibles
-
-- `npm run start:dev` : Démarre le serveur en mode développement avec rechargement automatique
+### Scripts disponibles
+- `npm run start` : Démarre le serveur
+- `npm run start:dev` : Démarre le serveur en mode développement
 - `npm run build` : Compile le projet
-- `npm run start:prod` : Démarre le serveur en mode production
-- `npm run lint` : Vérifie le code avec ESLint
-- `npm run test` : Lance les tests unitaires
+- `npm run test` : Lance les tests
 
-## Dépannage
-
-### Erreurs courantes
-
-1. **Erreur de port déjà utilisé**
-   - Solution : Changez le port dans le fichier `.env` ou arrêtez le processus qui utilise le port 3000
-
-2. **Erreur d'API ElevenLabs**
-   - Vérifiez que votre clé API est correcte dans le fichier `.env`
-   - Assurez-vous que votre compte ElevenLabs est actif
-
-3. **Erreur de compilation TypeScript**
-   - Exécutez `npm install` pour vous assurer que toutes les dépendances sont installées
-   - Vérifiez que vous utilisez la bonne version de Node.js
-
-## Contribution
+## 🤝 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à :
 1. Fork le projet
@@ -134,13 +150,16 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 4. Pousser vers la branche
 5. Ouvrir une Pull Request
 
-## Auteur
-
-Développé par **Salah Ait Hammou**
-
-- GitHub: [@Salahait11](https://github.com/Salahait11)
-- Repository: [API-NestJS-pour-ElevenLabs](https://github.com/Salahait11/API-NestJS-pour-ElevenLabs.git)
-
-## Licence
+## 📄 Licence
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 👥 Auteurs
+
+- SALAH AIT HAMMOU - Développeur principal
+
+## 🙏 Remerciements
+
+- ElevenLabs pour leur API de synthèse vocale
+- La communauté NestJS
+- Tous les contributeurs
