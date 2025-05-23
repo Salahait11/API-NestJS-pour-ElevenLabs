@@ -17,34 +17,85 @@ export class AudioService {
     private readonly configService: ConfigService, // Injecter ConfigService
   ) {}
 
-  async generateAudio(text: string, voiceId?: string): Promise<Buffer> {
+  async generateAudio(text: string, voiceId?: string, language?: string): Promise<Buffer> {
     const elevenLabsApiKey =
-      this.configService.get<string>('ELEVENLABS_API_KEY'); // Récupérer la clé API
+      this.configService.get<string>('ELEVENLABS_API_KEY');
 
     if (!elevenLabsApiKey) {
       this.logger.error('ElevenLabs API key is not configured.');
       throw new InternalServerErrorException('ElevenLabs API key is missing.');
     }
 
-    // Utiliser le voiceId fourni ou celui de la config
-    const selectedVoiceId = voiceId || this.configService.get<string>('ELEVENLABS_VOICE_ID');
+    // Sélectionner la voix en fonction de la langue si aucune voix n'est spécifiée
+    let selectedVoiceId = voiceId;
+    if (!selectedVoiceId) {
+      try {
+        const voicesData = await this.getAllVoices();
+        if (voicesData && voicesData.voices && voicesData.voices.length > 0) {
+          if (language) {
+            // Filtrer les voix par langue
+            const matchingVoices = voicesData.voices.filter(voice => {
+              if (!voice.labels || !voice.labels.language) return false;
+              
+              // Normaliser les codes de langue
+              const voiceLang = voice.labels.language.toLowerCase();
+              const targetLang = language.toLowerCase();
+              
+              // Gérer les cas spéciaux de correspondance de langue
+              const languageMap = {
+                'fr': ['french', 'fr', 'français'],
+                'en': ['english', 'en', 'anglais'],
+                'es': ['spanish', 'es', 'espagnol'],
+                'de': ['german', 'de', 'allemand'],
+                'it': ['italian', 'it', 'italien'],
+                'pt': ['portuguese', 'pt', 'portugais'],
+                'pl': ['polish', 'pl', 'polonais'],
+                'tr': ['turkish', 'tr', 'turc'],
+                'ru': ['russian', 'ru', 'russe'],
+                'ja': ['japanese', 'ja', 'japonais'],
+                'ko': ['korean', 'ko', 'coréen'],
+                'zh': ['chinese', 'zh', 'chinois']
+              };
+
+              // Vérifier si la langue de la voix correspond à la langue cible
+              return languageMap[targetLang]?.includes(voiceLang) || voiceLang === targetLang;
+            });
+            
+            if (matchingVoices.length > 0) {
+              selectedVoiceId = matchingVoices[0].voice_id;
+              this.logger.log(`Voix sélectionnée pour la langue ${language}: ${selectedVoiceId} (${matchingVoices[0].name})`);
+            } else {
+              selectedVoiceId = voicesData.voices[0].voice_id;
+              this.logger.warn(`Aucune voix trouvée pour la langue ${language}, utilisation de la première voix disponible: ${selectedVoiceId} (${voicesData.voices[0].name})`);
+            }
+          } else {
+            selectedVoiceId = voicesData.voices[0].voice_id;
+            this.logger.warn(`Aucune langue spécifiée, utilisation de la première voix disponible: ${selectedVoiceId} (${voicesData.voices[0].name})`);
+          }
+        } else {
+          this.logger.error('Aucune voix disponible sur ElevenLabs.');
+          throw new InternalServerErrorException('Aucune voix disponible sur ElevenLabs.');
+        }
+      } catch (err) {
+        this.logger.error('Impossible de récupérer la liste des voix ElevenLabs.', err);
+        throw new InternalServerErrorException('Impossible de récupérer la liste des voix ElevenLabs.');
+      }
+    }
+
     const elevenLabsApiUrl = `https://api.elevenlabs.io/v1/text-to-speech/${selectedVoiceId}`;
 
     const headers = {
       'Content-Type': 'application/json',
       'xi-api-key': elevenLabsApiKey,
-      Accept: 'audio/wav', // Indique que nous attendons un fichier audio WAV
+      Accept: 'audio/wav',
     };
 
     const body = {
       text: text,
-      // Vous pouvez ajouter d'autres options ici si besoin (par exemple, model_id, voice_settings)
-      // Voir la documentation ElevenLabs pour plus de détails: https://elevenlabs.io/docs/api-reference/text-to-speech
+      model_id: 'eleven_multilingual_v2' // Utiliser le modèle multilingue
     };
 
     try {
-      // Faire la requête POST à l'API ElevenLabs
-      // responseType: 'arraybuffer' est important pour recevoir les données binaires de l'audio
       const response = await firstValueFrom(
         this.httpService
           .post(elevenLabsApiUrl, body, {
@@ -57,7 +108,6 @@ export class AudioService {
                 `Error calling ElevenLabs API: ${error.message}`,
                 error.stack,
               );
-              // Tenter de loguer plus de détails si possible
               if (error.response) {
                 this.logger.error(
                   `ElevenLabs API Response Status: ${error.response.status}`,
@@ -73,10 +123,8 @@ export class AudioService {
           ),
       );
 
-      // La réponse contient les données audio binaires
       return Buffer.from(response.data);
     } catch (error) {
-      // Si l'erreur n'a pas déjà été transformée par catchError (peu probable ici mais bonne pratique)
       this.logger.error(
         `An unexpected error occurred during audio generation: ${error.message}`,
         error.stack,

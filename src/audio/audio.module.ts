@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [HttpModule],
   providers: [AudioService],
-  controllers: [AudioController]
+  controllers: [AudioController],
+  exports: [AudioService]
 })
 export class AudioModule {}

@@ -9,4 +9,8 @@ export class CreateAudioDto {
   @IsString()
   @IsOptional()
   voiceId?: string;
+
+  @IsString()
+  @IsOptional()
+  language?: string;
 }
